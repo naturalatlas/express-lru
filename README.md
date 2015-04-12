@@ -1,4 +1,7 @@
 # express-lru
+[![NPM version](http://img.shields.io/npm/v/express-lru.svg?style=flat)](https://www.npmjs.org/package/express-lru)
+[![Build Status](http://img.shields.io/travis/naturalatlas/express-lru/master.svg?style=flat)](https://travis-ci.org/naturalatlas/express-lru)
+[![Coverage Status](http://img.shields.io/coveralls/naturalatlas/express-lru/master.svg?style=flat)](https://coveralls.io/r/naturalatlas/express-lru)
 
 [Express](http://expressjs.com/) middleware that serves as a stopgap for [Varnish](http://en.wikipedia.org/wiki/Varnish_%28software%29) – for times when you don't have time to set up Varnish or want something simpler. A few notes:
 
