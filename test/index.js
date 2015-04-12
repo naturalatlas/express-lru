@@ -4,14 +4,15 @@ var request = require('supertest');
 var express = require('express');
 var lru = require('../index.js');
 
-function runsequence(expectSkip, route, options, test, done) {
-	var app = express();
-	var agent = request.agent(app);
+var app = express();
+var agent = request.agent(app);
+
+function runsequence(routePattern, expectSkip, route, options, test, done) {
 	options.ttl = 50;
 
 	// wrap the route to count the number of times it's executed
 	var executions = 0;
-	app.get('/route', lru(options), function(req, res, next) {
+	app.get(routePattern, lru(options), function(req, res, next) {
 		executions++;
 		route(req, res, next);
 	});
@@ -19,7 +20,7 @@ function runsequence(expectSkip, route, options, test, done) {
 	// execute tests against the route
 	function executeTest(delay, expectedExecutions, callback) {
 		setTimeout(function() {
-			var _agent = agent.get('/route');
+			var _agent = agent.get(routePattern);
 			test(_agent);
 			_agent.end(function(err) {
 				if (err) return callback(err);
@@ -46,7 +47,7 @@ describe('express-lru middleware', function() {
 			var route = function(req, res, next) {
 				res.json({hello:'world'});
 			};
-			runsequence(false, route, {}, function(agent) {
+			runsequence('/route1', false, route, {}, function(agent) {
 				agent
 					.expect('Content-Type', /application\/json/)
 					.expect('{"hello":"world"}')
@@ -59,7 +60,7 @@ describe('express-lru middleware', function() {
 			var route = function(req, res, next) {
 				res.set({'Content-Type': 'text/test'}).send('the content');
 			};
-			runsequence(false, route, {}, function(agent) {
+			runsequence('/route2', false, route, {}, function(agent) {
 				agent
 					.expect('Content-Type', /text\/test/)
 					.expect('the content')
@@ -68,7 +69,7 @@ describe('express-lru middleware', function() {
 		});
 		it('should work normally with Buffer', function(done) {
 			var route = function(req, res, next) { res.set({'Content-Type': 'text/test'}).send(new Buffer('hello')); };
-			runsequence(false, route, {}, function(agent) {
+			runsequence('/route3', false, route, {}, function(agent) {
 				agent
 					.expect('Content-Type', /text\/test/)
 					.expect('hello')
@@ -77,7 +78,7 @@ describe('express-lru middleware', function() {
 		});
 		it('should work normally with json', function(done) {
 			var route = function(req, res, next) { res.set({'Content-Type': 'text/test'}).send({a:'b'}); };
-			runsequence(false, route, {}, function(agent) {
+			runsequence('/route4', false, route, {}, function(agent) {
 				agent
 					.expect('Content-Type', /text\/test/)
 					.expect('{"a":"b"}')
@@ -90,7 +91,7 @@ describe('express-lru middleware', function() {
 		var route = function(req, res, next) {
 			res.set({'Content-Type':'text/plain'}).status(500).send('the content');
 		};
-		runsequence(true, route, {}, function(agent) {
+		runsequence('/route5', true, route, {}, function(agent) {
 			agent
 				.expect('Content-Type', /text\/plain/)
 				.expect('the content')
@@ -103,7 +104,7 @@ describe('express-lru middleware', function() {
 			res.set({'Content-Type': 'text/test'}).send('the content');
 		};
 		var skip = function(req) { return true; };
-		runsequence(true, route, {skip: skip}, function(agent) {
+		runsequence('/route6', true, route, {skip: skip}, function(agent) {
 			agent
 				.expect('Content-Type', /text\/test/)
 				.expect('the content')
