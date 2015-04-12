@@ -1,15 +1,15 @@
 # express-lru
 
-Express middleware that serves as a stopgap for [Varnish](http://en.wikipedia.org/wiki/Varnish_%28software%29) – for times when you don't have time to set up Varnish or want something simpler. A few notes:
+[Express](http://expressjs.com/) middleware that serves as a stopgap for [Varnish](http://en.wikipedia.org/wiki/Varnish_%28software%29) – for times when you don't have time to set up Varnish or want something simpler. A few notes:
 
  - It will only cache `200`-status responses.
- - Headers will be cached and served like normal.
- - Supports JSON, Buffer, text, etc
- - Has a `skip` option that allows you to control what requests bypass the cache. In most cases you’ll want to return `true` for logged in users.
+ - Response headers (like `Content-Type`) will be cached and served like normal.
+ - Supports JSON, Buffers, and Strings.
+ - Has a "skip" option that allows for control of what requests bypass the cache. In most cases you’ll want to return `true` for logged in users.
 
 ### Example Usage
 
-```
+```js
 var expresslru = require('express-lru');
 var cache = expresslru({ttl: 60000, skip: function(req) { return !!req.user; }});
 
