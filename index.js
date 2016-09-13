@@ -3,7 +3,8 @@ var noop = function() {};
 
 module.exports = function(options) {
 	var ttl = options.ttl || 30000;
-	var loader = new AsyncCache({max: 1000, maxAge: ttl, load: noop});
+	var max = options.max || 1000;
+	var loader = new AsyncCache({max: max, maxAge: ttl, load: noop});
 	var hasher = options.hasher || function(req) {
 		return req.originalUrl;
 	};
@@ -20,6 +21,7 @@ module.exports = function(options) {
 				if (body && (typeof body === 'object' || Array.isArray(body)) && !Buffer.isBuffer(body)) {
 					body = new Buffer(JSON.stringify(body), 'utf8');
 				}
+				// we skip caching by returning an "error" to async-cache)
 				var nocache = res.statusCode && res.statusCode !== 200;
 				callback(nocache, {
 					body: body,

@@ -19,7 +19,7 @@
     "url": "https://github.com/naturalatlas/express-lru.git"
   },
   "author": "Brian Reavis <brian@naturalatlas.com>",
-  "license": "Apache License, v2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/naturalatlas/express-lru/issues"
   },

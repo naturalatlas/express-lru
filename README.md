@@ -14,7 +14,13 @@
 
 ```js
 var expresslru = require('express-lru');
-var cache = expresslru({ttl: 60000, skip: function(req) { return !!req.user; }});
+var cache = expresslru({
+	max: 1000,
+	ttl: 60000,
+	skip: function(req) {
+		return !!req.user;
+	}
+});
 
 app.get('/myroute', cache, function(req, res, next) {
     // ...
@@ -23,7 +29,7 @@ app.get('/myroute', cache, function(req, res, next) {
 
 ## License
 
-Copyright &copy; 2015 [Natural Atlas, Inc.](https://github.com/naturalatlas) & [Contributors](https://github.com/naturalatlas/express-lru/graphs/contributors)
+Copyright &copy; 2015–2016 [Natural Atlas, Inc.](https://github.com/naturalatlas) & [Contributors](https://github.com/naturalatlas/express-lru/graphs/contributors)
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
 
